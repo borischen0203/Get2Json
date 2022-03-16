@@ -15,8 +15,15 @@ limitations under the License.
 */
 package main
 
-import "github.com/borischen0203/Get2Json/cmd"
+import (
+	"fmt"
+	"time"
+
+	"github.com/borischen0203/Get2Json/cmd"
+)
 
 func main() {
+	started := time.Now()
 	cmd.Execute()
+	fmt.Printf("done in %v\n", time.Since(started))
 }

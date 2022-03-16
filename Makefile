@@ -14,7 +14,7 @@ all: build test
 .PHONY: run
 ## run: runs go run main.go
 run:
-	go run main.go
+	go run main.go get https://github.com/fabpot https://github.com/andrew https://github.com/taylorotwell https://github.com/egoist https://github.com/HugoGiraudel https://www.bbc.co.uk/missing/thing
 
 
 .PHONY: clean

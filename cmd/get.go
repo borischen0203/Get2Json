@@ -23,6 +23,7 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -41,37 +42,156 @@ var getCmd = &cobra.Command{
 	of the responses it receives back.`,
 	// Args: cobra.RangeArgs(1, 2),TODO: input at least one parm.
 	Run: func(cmd *cobra.Command, args []string) {
+		fetchResponse(args)
+		// for _, link := range args {
+		// 	go GetHttpResponse(link)
+		// 	// fmt.Println(GetHttpResponse(link))
+		// }
+
+		// GoFetchResponseData(args)
+
 		// fmt.Println("Hello World!")
+		// reader := bufio.NewReader(os.Stdin)
+		// name, _ := reader.ReadString('\n')
+		// // GetHttpResponse(args[0])
+		// links := strings.Split(name, '\n')
+		// fmt.Println(name)
+		// fmt.Println("Enter link")
+		// scanner := bufio.NewScanner(os.Stdin)
+		// scanner.Scan()
+		// in := scanner.Text()
+		// wh := strings.Split(in, " ")
 
-		// GetHttpResponse(args[0])
-		links := []string{
-			"https://github.com/fabpot",
-			"https://github.com/andrew",
-			"https://github.com/taylorotwell",
-			"https://github.com/egoist",
-			"https://github.com/HugoGiraudel",
-		}
-		c := make(chan string)
-		var wg sync.WaitGroup
+		// scanner := bufio.NewScanner(os.Stdin)
+		// for {
+		// 	fmt.Println("Enter link: ")
+		// 	var exit string
+		// 	for scanner.Scan() {
+		// 		var lines []string
+		// 		line := scanner.Text()
+		// 		if line == "" {
+		// 			break
+		// 		}
+		// 		if line == "exit" {
+		// 			exit = line
+		// 			break
+		// 		} else {
+		// 			lines = append(lines, line)
+		// 		}
+		// 		GoFetchResponseData(lines)
+		// 	}
+		// 	if err := scanner.Err(); err != nil {
+		// 		log.Println(err)
+		// 	}
+		// 	if exit == "exit" {
+		// 		break
+		// 	}
+		// var lines []string
+		// in := scanner.Text()
+		// wh := strings.Split(in, " ")
+		// fmt.Println("Result:", wh[0])
+		// fmt.Println("Result:", wh[1])
 
-		for _, link := range links {
-			wg.Add(1) // This tells the waitgroup, that there is now 1 pending operation here
-			go checkUrl(link, c, &wg)
-		}
+		// lines = append(lines, line)
+		// if len(lines) > 0 {
+		// 	fmt.Println()
+		// 	fmt.Println("Result:")
+		// 	for _, line := range lines {
+		// 		fmt.Println(line)
+		// 	}
+		// 	fmt.Println()
+		// }
+		// GoFetchResponseData(lines)
+		// }
 
-		// this function literal (also called 'anonymous function' or 'lambda expression' in other languages)
-		// is useful because 'go' needs to prefix a function and we can save some space by not declaring a whole new function for this
-		go func() {
-			wg.Wait() // this blocks the goroutine until WaitGroup counter is zero
-			close(c)  // Channels need to be closed, otherwise the below loop will go on forever
-		}() // This calls itself
+		// for _, link := range wh {
+		// 	fmt.Println("I Got:", link)
+		// }
 
-		// this shorthand loop is syntactic sugar for an endless loop that just waits for results to come in through the 'c' channel
-		for msg := range c {
-			fmt.Println(msg)
-		}
+		// links := []string{
+		// 	"https://github.com/fabpot",
+		// 	"https://github.com/andrew",
+		// 	"https://github.com/taylorotwell",
+		// 	"https://github.com/egoist",
+		// 	"https://github.com/HugoGiraudel",
+		// }
+		// c := make(chan string)
+		// var wg sync.WaitGroup
+
+		// for _, link := range wh {
+		// 	wg.Add(1) // This tells the waitgroup, that there is now 1 pending operation here
+		// 	go checkUrl(link, c, &wg)
+		// }
+
+		// // this function literal (also called 'anonymous function' or 'lambda expression' in other languages)
+		// // is useful because 'go' needs to prefix a function and we can save some space by not declaring a whole new function for this
+		// go func() {
+		// 	wg.Wait() // this blocks the goroutine until WaitGroup counter is zero
+		// 	close(c)  // Channels need to be closed, otherwise the below loop will go on forever
+		// }() // This calls itself
+
+		// // this shorthand loop is syntactic sugar for an endless loop that just waits for results to come in through the 'c' channel
+		// for msg := range c {
+		// 	fmt.Println(msg)
+		// }
 	},
 }
+
+func fetchResponse(links []string) {
+	// fmt.Println("HomePage Endpoint Hit")
+	var wg sync.WaitGroup
+
+	wg.Add(len(links))
+	for _, url := range links {
+		go func(url string) {
+			time.Sleep(1 * time.Second)
+			result := GetHttpResponse(url)
+			fmt.Println(result)
+			wg.Done()
+		}(url)
+	}
+	wg.Wait()
+	// fmt.Println("Returning Response")
+	// fmt.Fprintf(w, "Responses")
+}
+
+// func fetch(url string, wg *sync.WaitGroup) {
+// 	result := GetHttpResponse(url)
+// 	fmt.Println(result)
+// 	wg.Done()
+// 	// fmt.Println(result)
+// 	// return result
+// }
+
+// //Go routinure to fetch data
+// func GoFetchResponseData(links []string) {
+// 	c := make(chan string)
+// 	var wg sync.WaitGroup
+
+// 	for _, link := range links {
+// 		wg.Add(1) // This tells the waitgroup, that there is now 1 pending operation here
+// 		go FetchResponseData(link, c, &wg)
+// 	}
+
+// 	// this function literal (also called 'anonymous function' or 'lambda expression' in other languages)
+// 	// is useful because 'go' needs to prefix a function and we can save some space by not declaring a whole new function for this
+// 	go func() {
+// 		wg.Wait() // this blocks the goroutine until WaitGroup counter is zero
+// 		close(c)  // Channels need to be closed, otherwise the below loop will go on forever
+// 	}() // This calls itself
+
+// 	// this shorthand loop is syntactic sugar for an endless loop that just waits for results to come in through the 'c' channel
+// 	for response := range c {
+// 		fmt.Println(response)
+// 	}
+// }
+
+// func FetchResponseData(url string, c chan string, wg *sync.WaitGroup) {
+// 	defer (*wg).Done()
+// 	result := GetHttpResponse(url)
+// 	// fmt.Println(result)
+// 	c <- fmt.Sprintln(result) // pump the result into the channel
+// }
 
 //GetHttpResponse function mainly get the response by request URL
 func GetHttpResponse(requestURL string) string {
@@ -93,13 +213,8 @@ func GetHttpResponse(requestURL string) string {
 		log.Fatal("Failed to generate json", err)
 	}
 	// fmt.Println(string(prettyJSON))
+	// wg.Done()
 	return string(prettyJSON)
-}
-
-func checkUrl(url string, c chan string, wg *sync.WaitGroup) {
-	defer (*wg).Done()
-	result := GetHttpResponse(url)
-	c <- result // pump the result into the channel
 }
 
 func init() {

@@ -42,71 +42,16 @@ var getCmd = &cobra.Command{
 	of the responses it receives back.`,
 	// Args: cobra.RangeArgs(1, 2),TODO: input at least one parm.
 	Run: func(cmd *cobra.Command, args []string) {
-		fetchResponse(args)
+
+		//TODO: Add read file code here
+
+		// fetchResponse(args)
 		// for _, link := range args {
 		// 	go GetHttpResponse(link)
 		// 	// fmt.Println(GetHttpResponse(link))
 		// }
 
-		// GoFetchResponseData(args)
-
-		// fmt.Println("Hello World!")
-		// reader := bufio.NewReader(os.Stdin)
-		// name, _ := reader.ReadString('\n')
-		// // GetHttpResponse(args[0])
-		// links := strings.Split(name, '\n')
-		// fmt.Println(name)
-		// fmt.Println("Enter link")
-		// scanner := bufio.NewScanner(os.Stdin)
-		// scanner.Scan()
-		// in := scanner.Text()
-		// wh := strings.Split(in, " ")
-
-		// scanner := bufio.NewScanner(os.Stdin)
-		// for {
-		// 	fmt.Println("Enter link: ")
-		// 	var exit string
-		// 	for scanner.Scan() {
-		// 		var lines []string
-		// 		line := scanner.Text()
-		// 		if line == "" {
-		// 			break
-		// 		}
-		// 		if line == "exit" {
-		// 			exit = line
-		// 			break
-		// 		} else {
-		// 			lines = append(lines, line)
-		// 		}
-		// 		GoFetchResponseData(lines)
-		// 	}
-		// 	if err := scanner.Err(); err != nil {
-		// 		log.Println(err)
-		// 	}
-		// 	if exit == "exit" {
-		// 		break
-		// 	}
-		// var lines []string
-		// in := scanner.Text()
-		// wh := strings.Split(in, " ")
-		// fmt.Println("Result:", wh[0])
-		// fmt.Println("Result:", wh[1])
-
-		// lines = append(lines, line)
-		// if len(lines) > 0 {
-		// 	fmt.Println()
-		// 	fmt.Println("Result:")
-		// 	for _, line := range lines {
-		// 		fmt.Println(line)
-		// 	}
-		// 	fmt.Println()
-		// }
-		// GoFetchResponseData(lines)
-		// }
-
-		// for _, link := range wh {
-		// 	fmt.Println("I Got:", link)
-		// }
+		GoFetchResponseData(args)
 
 		// links := []string{
 		// 	"https://github.com/fabpot",
@@ -155,43 +100,43 @@ func fetchResponse(links []string) {
 	// fmt.Fprintf(w, "Responses")
 }
 
-// func fetch(url string, wg *sync.WaitGroup) {
-// 	result := GetHttpResponse(url)
-// 	fmt.Println(result)
-// 	wg.Done()
-// 	// fmt.Println(result)
-// 	// return result
-// }
+func fetch(url string, wg *sync.WaitGroup) {
+	result := GetHttpResponse(url)
+	fmt.Println(result)
+	wg.Done()
+	// fmt.Println(result)
+	// return result
+}
 
-// //Go routinure to fetch data
-// func GoFetchResponseData(links []string) {
-// 	c := make(chan string)
-// 	var wg sync.WaitGroup
+//Go routinure to fetch data
+func GoFetchResponseData(links []string) {
+	c := make(chan string)
+	var wg sync.WaitGroup
 
-// 	for _, link := range links {
-// 		wg.Add(1) // This tells the waitgroup, that there is now 1 pending operation here
-// 		go FetchResponseData(link, c, &wg)
-// 	}
+	for _, link := range links {
+		wg.Add(1) // This tells the waitgroup, that there is now 1 pending operation here
+		go FetchResponseData(link, c, &wg)
+	}
 
-// 	// this function literal (also called 'anonymous function' or 'lambda expression' in other languages)
-// 	// is useful because 'go' needs to prefix a function and we can save some space by not declaring a whole new function for this
-// 	go func() {
-// 		wg.Wait() // this blocks the goroutine until WaitGroup counter is zero
-// 		close(c)  // Channels need to be closed, otherwise the below loop will go on forever
-// 	}() // This calls itself
+	// this function literal (also called 'anonymous function' or 'lambda expression' in other languages)
+	// is useful because 'go' needs to prefix a function and we can save some space by not declaring a whole new function for this
+	go func() {
+		wg.Wait() // this blocks the goroutine until WaitGroup counter is zero
+		close(c)  // Channels need to be closed, otherwise the below loop will go on forever
+	}() // This calls itself
 
-// 	// this shorthand loop is syntactic sugar for an endless loop that just waits for results to come in through the 'c' channel
-// 	for response := range c {
-// 		fmt.Println(response)
-// 	}
-// }
+	// this shorthand loop is syntactic sugar for an endless loop that just waits for results to come in through the 'c' channel
+	for response := range c {
+		fmt.Println(response)
+	}
+}
 
-// func FetchResponseData(url string, c chan string, wg *sync.WaitGroup) {
-// 	defer (*wg).Done()
-// 	result := GetHttpResponse(url)
-// 	// fmt.Println(result)
-// 	c <- fmt.Sprintln(result) // pump the result into the channel
-// }
+func FetchResponseData(url string, c chan string, wg *sync.WaitGroup) {
+	defer (*wg).Done()
+	result := GetHttpResponse(url)
+	// fmt.Println(result)
+	c <- fmt.Sprintln(result) // pump the result into the channel
+}
 
 //GetHttpResponse function mainly get the response by request URL
 func GetHttpResponse(requestURL string) string {

@@ -22,10 +22,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -70,8 +72,10 @@ var getCmd = &cobra.Command{
 				//-----v2-----
 
 				//-----v1-----
-				GoFetchResponseData(lines)
+				// GoFetchResponseData(lines)
 				//-----v1-----
+
+				fetchResponse(lines)
 
 				// for _, line := range lines {
 				// 	// fmt.Println(line)
@@ -131,17 +135,22 @@ var getCmd = &cobra.Command{
 func fetchResponse(links []string) {
 	// fmt.Println("HomePage Endpoint Hit")
 	var wg sync.WaitGroup
+	m := make(map[int]GetHeadResponse)
 
 	wg.Add(len(links))
-	for _, url := range links {
-		go func(url string) {
+	for index, url := range links {
+		go func(index int, url string) {
 			// time.Sleep(1 * time.Second)
 			result := GetHeadResponseService(url)
-			prettyJSON(result)
+			m[index] = result
 			wg.Done()
-		}(url)
+		}(index, url)
 	}
 	wg.Wait()
+	for i := 0; i < len(links); i++ {
+		fmt.Println(prettyJSON(m[i]))
+	}
+
 	// fmt.Println("Returning Response")
 	// fmt.Fprintf(w, "Responses")
 }
@@ -157,7 +166,7 @@ func GoFetchResponseData(links []string) {
 	for _, link := range links {
 		wg.Add(1) // This tells the waitgroup, that there is now 1 pending operation here
 		go FetchResponseData(link, c, &wg)
-
+		// fmt.Println(prettyJSON(<-c))
 	}
 
 	// this function literal (also called 'anonymous function' or 'lambda expression' in other languages)
@@ -183,14 +192,24 @@ func FetchResponseData(url string, c chan GetHeadResponse, wg *sync.WaitGroup) {
 }
 
 //---------------V1------------------------
+var timeout = time.Duration(2 * time.Second)
 
+func dialTimeout(network, addr string) (net.Conn, error) {
+	return net.DialTimeout(network, addr, timeout)
+}
+
+//Dial: dialTimeout
 //GetHeadResponseService function mainly get the response head info
 func GetHeadResponseService(requestURL string) GetHeadResponse {
-	var DefaultTransport http.RoundTripper = &http.Transport{}
+	// var DefaultTransport http.RoundTripper = &http.Transport{Dial: dialTimeout}
+	var DefaultTransport http.RoundTripper = &http.Transport{Dial: (&net.Dialer{
+		Timeout: 2 * time.Second,
+	}).Dial,
+		TLSHandshakeTimeout: 5 * time.Second}
 	request, _ := http.NewRequest("GET", requestURL, nil)
 	response, err := DefaultTransport.RoundTrip(request)
 	if err != nil {
-		fmt.Printf("%s", err)
+		// fmt.Printf("%s", err)
 		return GetHeadResponse{requestURL, 0, 0}
 	}
 	defer response.Body.Close()

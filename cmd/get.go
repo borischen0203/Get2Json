@@ -75,7 +75,13 @@ var getCmd = &cobra.Command{
 				// GoFetchResponseData(lines)
 				//-----v1-----
 
-				fetchResponse(lines)
+				//-----v3
+				// fetchResponse(lines)
+				//-----v3
+
+				//-----v4
+				// goChannel(lines)
+				//-----v4
 
 				// for _, line := range lines {
 				// 	// fmt.Println(line)
@@ -129,6 +135,22 @@ var getCmd = &cobra.Command{
 		// 	fmt.Println(msg)
 		// }
 	},
+}
+
+func goChannel(urls []string) {
+	ch := make(chan string)
+	go runChannel(urls, ch)
+	for output := range ch {
+		fmt.Println(output)
+	}
+}
+
+func runChannel(urls []string, ch chan string) {
+	for i := 0; i < len(urls); i++ {
+		result := GetHeadResponseService(urls[i])
+		ch <- prettyJSON(result)
+	}
+	close(ch)
 }
 
 //-----v2-----
@@ -202,9 +224,8 @@ func dialTimeout(network, addr string) (net.Conn, error) {
 //GetHeadResponseService function mainly get the response head info
 func GetHeadResponseService(requestURL string) GetHeadResponse {
 	// var DefaultTransport http.RoundTripper = &http.Transport{Dial: dialTimeout}
-	var DefaultTransport http.RoundTripper = &http.Transport{Dial: (&net.Dialer{
-		Timeout: 2 * time.Second,
-	}).Dial,
+	var DefaultTransport http.RoundTripper = &http.Transport{
+		Dial:                (&net.Dialer{Timeout: 2 * time.Second}).Dial,
 		TLSHandshakeTimeout: 5 * time.Second}
 	request, _ := http.NewRequest("GET", requestURL, nil)
 	response, err := DefaultTransport.RoundTrip(request)

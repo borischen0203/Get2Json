@@ -15,6 +15,14 @@ This `get2json` command-line tool mainly output the header information as Json f
 
 
 # How to use
+Sample URLs for input
+```bash
+http://www.bbc.co.uk/iplayer
+http://checkip.amazonaws.com
+https://www.bbc.co.uk/missing/thing
+https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Juvenile_Ragdoll.jpg/220px-Juvenile_Ragdoll.jpg
+https://site.mockito.org/
+```
 
 ## Run in Docker:
 Required
@@ -29,6 +37,9 @@ Step2:  Run docker image as below command
 ```bash
 docker run -it --rm borischen0203/get2json get
 ```
+
+
+
 
 ### Docker run demo
 ```bash

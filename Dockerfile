@@ -1,7 +1,7 @@
 # build stage
-FROM golang:1.16-alpine AS build
+FROM golang:1.17-alpine AS build
 ADD . /src
-RUN cd /src && go build -o Get2Json
+RUN cd /src && go build -o get2json
 
 # final stage
 FROM alpine as runtime
@@ -11,7 +11,7 @@ RUN apk add --no-cache tzdata
 ENV TZ=Europe/London
 
 WORKDIR /app
-COPY --from=build /src/litclock /app/litclock
+COPY --from=build /src/get2json /app/get2json
 COPY run.sh /app/
 RUN cd /app && chmod +x run.sh
 

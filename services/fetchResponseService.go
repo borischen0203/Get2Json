@@ -16,7 +16,6 @@ import (
 )
 
 func FetchResponseService(links []string) {
-	// fmt.Println("HomePage Endpoint Hit")
 	var wg sync.WaitGroup
 	m := make(map[int]dto.HeadResponse)
 

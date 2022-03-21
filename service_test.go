@@ -17,34 +17,34 @@ type Tests struct {
 	expectedError error
 }
 
-// func TestInputValidURL1(t *testing.T) {
-// 	//Mock GET response:
-// 	test := Tests{
+func TestInputValidURL1(t *testing.T) {
+	//Mock GET response:
+	test := Tests{
 
-// 		name: "Should return the correct output when input is valid URL",
-// 		server: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 			w.WriteHeader(http.StatusOK)
-// 			w.Write([]byte("137.22.165.138"))
-// 		})),
-// 		response: &GetHeadResponse{
-// 			Url:           "http://checkip.amazonaws.com",
-// 			StatusCode:    200,
-// 			ContentLength: 15,
-// 		},
-// 		expectedError: nil,
-// 	}
-//
-// 	//Test service
-// 	t.Run(test.name, func(t *testing.T) {
-// 		defer test.server.Close()
+		name: "Should return the correct output when input is valid URL",
+		server: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`137.22.165.138`))
+		})),
+		response: &dto.HeadResponse{
+			Url:           "http://checkip.amazonaws.com",
+			StatusCode:    200,
+			ContentLength: 15,
+		},
+		expectedError: nil,
+	}
 
-// 		resp := GetHeadResponseService("http://checkip.amazonaws.com")
+	//Test service
+	t.Run(test.name, func(t *testing.T) {
+		defer test.server.Close()
 
-// 		if !reflect.DeepEqual(resp, test.response) {
-// 			t.Errorf("FAILED: expected %v, got %v\n", test.response, resp)
-// 		}
-// 	})
-// }
+		resp := services.GetHeadResponse("http://checkip.amazonaws.com")
+
+		if !reflect.DeepEqual(resp, test.response) {
+			t.Errorf("FAILED: expected %v, got %v\n", test.response, resp)
+		}
+	})
+}
 
 func TestInputValidURL2(t *testing.T) {
 	//Mock GET response:

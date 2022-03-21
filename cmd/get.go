@@ -188,15 +188,14 @@ func GetHeadResponseService(requestURL string) *GetHeadResponse {
 	request, _ := http.NewRequest("GET", requestURL, nil)
 	response, err := DefaultTransport.RoundTrip(request)
 	if err != nil {
-		fmt.Printf("%s", err)
-		fmt.Println(err.Error())
+		// fmt.Printf("%s", err)
 		return &GetHeadResponse{requestURL, 0, 0}
 	}
 	defer response.Body.Close()
 
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		fmt.Printf("%s", err)
+		// fmt.Printf("%s", err)
 		return &GetHeadResponse{requestURL, 0, 0}
 	}
 

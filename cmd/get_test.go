@@ -116,7 +116,7 @@ func TestInputInValidURL1(t *testing.T) {
 	test := Tests{
 		name: "Should return the fields:0 output when input is invalid URL",
 		server: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusMovedPermanently)
+			w.WriteHeader(0)
 			w.Write([]byte(``))
 		})),
 		response: &GetHeadResponse{
@@ -144,8 +144,8 @@ func TestInputInValidURL2(t *testing.T) {
 	test := Tests{
 		name: "Should return the fields:0 output when input is invalid URL",
 		server: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusMovedPermanently)
-			w.Write([]byte(``))
+			w.WriteHeader(0)
+			w.Write([]byte(""))
 		})),
 		response: &GetHeadResponse{
 			Url:           "https://bbc.",

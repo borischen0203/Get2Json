@@ -17,27 +17,19 @@ package cmd
 
 import (
 	"bufio"
-	"encoding/binary"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"log"
-	"net"
-	"net/http"
-	"net/url"
 	"os"
 	"strings"
-	"sync"
-	"time"
 
+	"github.com/borischen0203/Get2Json/services"
 	"github.com/spf13/cobra"
 )
 
-type GetHeadResponse struct {
-	Url           string `json:"Url"`
-	StatusCode    int    `json:"Status-Code"`
-	ContentLength int64  `json:"Content-Length"`
-}
+// type GetHeadResponse struct {
+// 	Url           string `json:"Url"`
+// 	StatusCode    int    `json:"Status-Code"`
+// 	ContentLength int64  `json:"Content-Length"`
+// }
 
 // getCmd represents the get command
 var getCmd = &cobra.Command{
@@ -46,103 +38,139 @@ var getCmd = &cobra.Command{
 	Long: `This command makes HTTP request and reports on certain properties
 	of the responses it receives back.`,
 	Args: cobra.NoArgs,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run:  GetResponseCommand,
+	// Run: func(cmd *cobra.Command, args []string) {
 
-		scn := bufio.NewScanner(os.Stdin)
-		for {
-			fmt.Println("Please enter URLs:")
-			var lines []string
-			for scn.Scan() {
-				line := scn.Text()
-				if len(line) == 1 {
-					// enter q to into next step or exit
-					if line[0] == 'q' {
-						break
-					}
+	// 	scn := bufio.NewScanner(os.Stdin)
+	// 	for {
+	// 		fmt.Println("Please enter URLs:")
+	// 		var lines []string
+	// 		for scn.Scan() {
+	// 			line := scn.Text()
+	// 			if len(line) == 1 {
+	// 				// enter q to into next step or exit
+	// 				if line[0] == 'q' {
+	// 					break
+	// 				}
+	// 			}
+	// 			//Remove space before add to lines
+	// 			lines = append(lines, strings.TrimSpace(line))
+
+	// 		}
+
+	// 		//Print result
+	// 		if len(lines) > 0 {
+	// 			fmt.Println()
+	// 			fmt.Println("Result:")
+	// 			fetchResponse(lines)
+	// 			fmt.Println()
+	// 		}
+
+	// 		if err := scn.Err(); err != nil {
+	// 			fmt.Fprintln(os.Stderr, err)
+	// 			break
+	// 		}
+	// 		if len(lines) == 0 {
+	// 			break
+	// 		}
+	// 	}
+
+	// },
+}
+
+func GetResponseCommand(cmd *cobra.Command, args []string) {
+	scn := bufio.NewScanner(os.Stdin)
+	for {
+		fmt.Println("Please enter URLs:")
+		var lines []string
+		for scn.Scan() {
+			line := scn.Text()
+			if len(line) == 1 {
+				// enter q to into next step or exit
+				if line[0] == 'q' {
+					break
 				}
-				//Remove space before add to lines
-				lines = append(lines, strings.TrimSpace(line))
+			}
+			//Remove space before add to lines
+			lines = append(lines, strings.TrimSpace(line))
 
-			}
-
-			//Print result
-			if len(lines) > 0 {
-				fmt.Println()
-				fmt.Println("Result:")
-				fetchResponse(lines)
-				fmt.Println()
-			}
-
-			if err := scn.Err(); err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				break
-			}
-			if len(lines) == 0 {
-				break
-			}
 		}
 
-	},
-}
+		//Print result
+		if len(lines) > 0 {
+			fmt.Println()
+			fmt.Println("Result:")
+			services.FetchResponseService(lines)
+			fmt.Println()
+		}
 
-func fetchResponse(links []string) {
-	// fmt.Println("HomePage Endpoint Hit")
-	var wg sync.WaitGroup
-	m := make(map[int]GetHeadResponse)
-
-	wg.Add(len(links))
-	for index, url := range links {
-		go func(index int, url string) {
-			// time.Sleep(1 * time.Second)
-			result := GetHeadResponseService(url)
-			m[index] = *result
-			wg.Done()
-		}(index, url)
-	}
-	wg.Wait()
-	for i := 0; i < len(links); i++ {
-		fmt.Println(prettyJSON(m[i]))
+		if err := scn.Err(); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			break
+		}
+		if len(lines) == 0 {
+			break
+		}
 	}
 }
+
+// func fetchResponseService(links []string) {
+// 	// fmt.Println("HomePage Endpoint Hit")
+// 	var wg sync.WaitGroup
+// 	m := make(map[int]dto.GetHeadResponse)
+
+// 	wg.Add(len(links))
+// 	for index, url := range links {
+// 		go func(index int, url string) {
+// 			result := services.GetHeadResponseService(url)
+// 			m[index] = *result
+// 			wg.Done()
+// 		}(index, url)
+// 	}
+// 	wg.Wait()
+// 	for i := 0; i < len(links); i++ {
+// 		fmt.Println(prettyJSON(m[i]))
+// 	}
+// }
 
 //GetHeadResponseService function mainly get the response head info
-func GetHeadResponseService(req string) *GetHeadResponse {
-	validResult, err := url.ParseRequestURI(req)
-	if err != nil {
-		return &GetHeadResponse{req, 0, 0}
-	}
-	requestURL := validResult.String()
-	var DefaultTransport http.RoundTripper = &http.Transport{
-		Dial:                (&net.Dialer{Timeout: 2 * time.Second}).Dial,
-		TLSHandshakeTimeout: 5 * time.Second}
-	request, _ := http.NewRequest("GET", requestURL, nil)
-	response, err := DefaultTransport.RoundTrip(request)
-	if err != nil {
-		return &GetHeadResponse{requestURL, 0, 0}
-	}
-	defer response.Body.Close()
+// func GetHeadResponseService(req string) *GetHeadResponse {
+// 	validResult, err := url.ParseRequestURI(req)
+// 	if err != nil {
+// 		return &GetHeadResponse{req, 0, 0}
+// 	}
+// 	requestURL := validResult.String()
+// 	var DefaultTransport http.RoundTripper = &http.Transport{
+// 		Dial:                (&net.Dialer{Timeout: 2 * time.Second}).Dial,
+// 		TLSHandshakeTimeout: 5 * time.Second}
+// 	request, _ := http.NewRequest("GET", requestURL, nil)
+// 	response, err := DefaultTransport.RoundTrip(request)
+// 	if err != nil {
+// 		return &GetHeadResponse{requestURL, 0, 0}
+// 	}
+// 	defer response.Body.Close()
 
-	contents, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return &GetHeadResponse{requestURL, 0, 0}
-	}
+// 	contents, err := ioutil.ReadAll(response.Body)
+// 	if err != nil {
+// 		return &GetHeadResponse{requestURL, 0, 0}
+// 	}
 
-	//Set response
-	result := GetHeadResponse{
-		Url:           requestURL,
-		StatusCode:    response.StatusCode,
-		ContentLength: int64(binary.Size(contents)),
-	}
-	return &result
-}
+// 	//Set response
+// 	result := GetHeadResponse{
+// 		Url:           requestURL,
+// 		StatusCode:    response.StatusCode,
+// 		ContentLength: int64(binary.Size(contents)),
+// 	}
+// 	return &result
+// }
 
-func prettyJSON(result GetHeadResponse) string {
-	prettyJSON, err := json.MarshalIndent(result, "", "   ")
-	if err != nil {
-		log.Fatal("Failed to generate json", err)
-	}
-	return string(prettyJSON)
-}
+// func prettyJSON(result dto.GetHeadResponse) string {
+// 	prettyJSON, err := json.MarshalIndent(result, "", "   ")
+// 	if err != nil {
+// 		log.Fatal("Failed to generate json", err)
+// 	}
+// 	return string(prettyJSON)
+// }
 
 func init() {
 	rootCmd.AddCommand(getCmd)

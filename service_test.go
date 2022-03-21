@@ -1,16 +1,19 @@
-package cmd
+package main
 
 import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
+
+	"github.com/borischen0203/Get2Json/dto"
+	"github.com/borischen0203/Get2Json/services"
 )
 
 type Tests struct {
 	name          string
 	server        *httptest.Server
-	response      *GetHeadResponse
+	response      *dto.HeadResponse
 	expectedError error
 }
 
@@ -57,7 +60,7 @@ func TestInputValidURL2(t *testing.T) {
 			</body>
 			</html>`))
 		})),
-		response: &GetHeadResponse{
+		response: &dto.HeadResponse{
 			Url:           "http://www.bbc.co.uk/iplayer",
 			StatusCode:    301,
 			ContentLength: 169,
@@ -69,7 +72,7 @@ func TestInputValidURL2(t *testing.T) {
 	t.Run(test.name, func(t *testing.T) {
 		defer test.server.Close()
 
-		resp := GetHeadResponseService("http://www.bbc.co.uk/iplayer")
+		resp := services.GetHeadResponse("http://www.bbc.co.uk/iplayer")
 
 		if !reflect.DeepEqual(resp, test.response) {
 			t.Errorf("FAILED: expected %v, got %v\n", test.response, resp)
@@ -91,7 +94,7 @@ func TestInputValidURL3(t *testing.T) {
 			</body>
 			</html>`))
 		})),
-		response: &GetHeadResponse{
+		response: &dto.HeadResponse{
 			Url:           "http://www.bbc.co.uk/missing/thing",
 			StatusCode:    301,
 			ContentLength: 162,
@@ -103,7 +106,7 @@ func TestInputValidURL3(t *testing.T) {
 	t.Run(test.name, func(t *testing.T) {
 		defer test.server.Close()
 
-		resp := GetHeadResponseService("http://www.bbc.co.uk/missing/thing")
+		resp := services.GetHeadResponse("http://www.bbc.co.uk/missing/thing")
 
 		if !reflect.DeepEqual(resp, test.response) {
 			t.Errorf("FAILED: expected %v, got %v\n", test.response, resp)
@@ -148,7 +151,7 @@ func TestInputInvalidURL1(t *testing.T) {
 			w.WriteHeader(0)
 			w.Write([]byte(``))
 		})),
-		response: &GetHeadResponse{
+		response: &dto.HeadResponse{
 			Url:           "HelloWorld",
 			StatusCode:    0,
 			ContentLength: 0,
@@ -160,7 +163,7 @@ func TestInputInvalidURL1(t *testing.T) {
 	t.Run(test.name, func(t *testing.T) {
 		defer test.server.Close()
 
-		resp := GetHeadResponseService("HelloWorld")
+		resp := services.GetHeadResponse("HelloWorld")
 
 		if !reflect.DeepEqual(resp, test.response) {
 			t.Errorf("FAILED: expected %v, got %v\n", test.response, resp)
@@ -176,7 +179,7 @@ func TestInputInvalidURL2(t *testing.T) {
 			w.WriteHeader(0)
 			w.Write([]byte(""))
 		})),
-		response: &GetHeadResponse{
+		response: &dto.HeadResponse{
 			Url:           "https://bbc.",
 			StatusCode:    0,
 			ContentLength: 0,
@@ -188,7 +191,7 @@ func TestInputInvalidURL2(t *testing.T) {
 	t.Run(test.name, func(t *testing.T) {
 		defer test.server.Close()
 
-		resp := GetHeadResponseService("https://bbc.")
+		resp := services.GetHeadResponse("https://bbc.")
 
 		if !reflect.DeepEqual(resp, test.response) {
 			t.Errorf("FAILED: expected %v, got %v\n", test.response, resp)
@@ -204,7 +207,7 @@ func TestInputInvalidURL3(t *testing.T) {
 			w.WriteHeader(0)
 			w.Write([]byte(""))
 		})),
-		response: &GetHeadResponse{
+		response: &dto.HeadResponse{
 			Url:           "",
 			StatusCode:    0,
 			ContentLength: 0,
@@ -216,7 +219,7 @@ func TestInputInvalidURL3(t *testing.T) {
 	t.Run(test.name, func(t *testing.T) {
 		defer test.server.Close()
 
-		resp := GetHeadResponseService("")
+		resp := services.GetHeadResponse("")
 
 		if !reflect.DeepEqual(resp, test.response) {
 			t.Errorf("FAILED: expected %v, got %v\n", test.response, resp)
@@ -232,7 +235,7 @@ func TestInputInvalidURL4(t *testing.T) {
 			w.WriteHeader(0)
 			w.Write([]byte(""))
 		})),
-		response: &GetHeadResponse{
+		response: &dto.HeadResponse{
 			Url:           "~!@#$%^\u0026*()_+{}|:\"\u003c\u003e?,./';\\[]=˙ˊˋˇ",
 			StatusCode:    0,
 			ContentLength: 0,
@@ -244,7 +247,7 @@ func TestInputInvalidURL4(t *testing.T) {
 	t.Run(test.name, func(t *testing.T) {
 		defer test.server.Close()
 
-		resp := GetHeadResponseService("~!@#$%^\u0026*()_+{}|:\"\u003c\u003e?,./';\\[]=˙ˊˋˇ")
+		resp := services.GetHeadResponse("~!@#$%^\u0026*()_+{}|:\"\u003c\u003e?,./';\\[]=˙ˊˋˇ")
 
 		if !reflect.DeepEqual(resp, test.response) {
 			t.Errorf("FAILED: expected %v, got %v\n", test.response, resp)

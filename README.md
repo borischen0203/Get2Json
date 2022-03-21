@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/scraly/gophers/main/back-to-the-future-v2.png" alt="back-to-the-future-v2" width=400>
+<img src="https://raw.githubusercontent.com/scraly/gophers/main/gopher-johnny.jpg" alt="gopher-johnny" width=400>
 
 <p align="Left">
   <p align="Left">

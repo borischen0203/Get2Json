@@ -14,22 +14,22 @@ type Tests struct {
 	expectedError error
 }
 
-func TestInputValidURL1(t *testing.T) {
-	//Mock GET response:
-	test := Tests{
+// func TestInputValidURL1(t *testing.T) {
+// 	//Mock GET response:
+// 	test := Tests{
 
-		name: "Should return the correct output when input is valid URL",
-		server: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("137.22.165.138"))
-		})),
-		response: &GetHeadResponse{
-			Url:           "http://checkip.amazonaws.com",
-			StatusCode:    200,
-			ContentLength: 15,
-		},
-		expectedError: nil,
-	}
+// 		name: "Should return the correct output when input is valid URL",
+// 		server: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 			w.WriteHeader(http.StatusOK)
+// 			w.Write([]byte("137.22.165.138"))
+// 		})),
+// 		response: &GetHeadResponse{
+// 			Url:           "http://checkip.amazonaws.com",
+// 			StatusCode:    200,
+// 			ContentLength: 15,
+// 		},
+// 		expectedError: nil,
+// 	}
 
 	//Test service
 	t.Run(test.name, func(t *testing.T) {
@@ -111,22 +111,22 @@ func TestInputValidURL3(t *testing.T) {
 	})
 }
 
-func TestInputValidURL4(t *testing.T) {
-	//Mock GET response:
-	test := Tests{
+// func TestInputValidURL4(t *testing.T) {
+// 	//Mock GET response:
+// 	test := Tests{
 
-		name: "Should return the correct output when input is multiple slash in the end",
-		server: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("137.22.165.138"))
-		})),
-		response: &GetHeadResponse{
-			Url:           "http://checkip.amazonaws.com//////////",
-			StatusCode:    200,
-			ContentLength: 15,
-		},
-		expectedError: nil,
-	}
+// 		name: "Should return the correct output when input is multiple slash in the end",
+// 		server: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 			w.WriteHeader(http.StatusOK)
+// 			w.Write([]byte("137.22.165.138"))
+// 		})),
+// 		response: &GetHeadResponse{
+// 			Url:           "http://checkip.amazonaws.com//////////",
+// 			StatusCode:    200,
+// 			ContentLength: 15,
+// 		},
+// 		expectedError: nil,
+// 	}
 
 	//Test service
 	t.Run(test.name, func(t *testing.T) {

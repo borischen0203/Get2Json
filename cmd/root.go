@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/borischen0203/Get2Json/services"
 	"github.com/spf13/cobra"
 
 	"github.com/spf13/viper"
@@ -33,7 +34,10 @@ var rootCmd = &cobra.Command{
 	Long:  `Get2Json cli application written in Go.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	Run: func(cmd *cobra.Command, args []string) {
+		sentence := "Welcome to get2json!"
+		services.GopherSay(sentence)
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

@@ -1,4 +1,4 @@
-APP?=Get2Json
+APP?=get2json
 
 default:
 	echo ${APP}
@@ -28,6 +28,10 @@ clean:
 test:
 	go test -v -count=1 -race ./...
 
+.PHONY: docker-build
+## docker-build: build the docker image
+docker-build:
+	docker buildx build --platform linux/amd64 -t get2json .
 
 .PHONY: help
 ## help: prints this help message

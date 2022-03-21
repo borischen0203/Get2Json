@@ -111,10 +111,39 @@ func TestInputValidURL3(t *testing.T) {
 	})
 }
 
-func TestInputInValidURL1(t *testing.T) {
+func TestInputValidURL4(t *testing.T) {
 	//Mock GET response:
 	test := Tests{
-		name: "Should return the fields:0 output when input is invalid URL",
+
+		name: "Should return the correct output when input is multiple slash in the end",
+		server: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("137.22.165.138"))
+		})),
+		response: &GetHeadResponse{
+			Url:           "http://checkip.amazonaws.com//////////",
+			StatusCode:    200,
+			ContentLength: 15,
+		},
+		expectedError: nil,
+	}
+
+	//Test service
+	t.Run(test.name, func(t *testing.T) {
+		defer test.server.Close()
+
+		resp := GetHeadResponseService("http://checkip.amazonaws.com//////////")
+
+		if !reflect.DeepEqual(resp, test.response) {
+			t.Errorf("FAILED: expected %v, got %v\n", test.response, resp)
+		}
+	})
+}
+
+func TestInputInvalidURL1(t *testing.T) {
+	//Mock GET response:
+	test := Tests{
+		name: "Should return the output with fields:0 when input is invalid URL",
 		server: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(0)
 			w.Write([]byte(``))
@@ -139,10 +168,10 @@ func TestInputInValidURL1(t *testing.T) {
 	})
 }
 
-func TestInputInValidURL2(t *testing.T) {
+func TestInputInvalidURL2(t *testing.T) {
 	//Mock GET response:
 	test := Tests{
-		name: "Should return the fields:0 output when input is invalid URL",
+		name: "Should return the output with fields:0 when input is invalid URL",
 		server: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(0)
 			w.Write([]byte(""))
@@ -160,6 +189,62 @@ func TestInputInValidURL2(t *testing.T) {
 		defer test.server.Close()
 
 		resp := GetHeadResponseService("https://bbc.")
+
+		if !reflect.DeepEqual(resp, test.response) {
+			t.Errorf("FAILED: expected %v, got %v\n", test.response, resp)
+		}
+	})
+}
+
+func TestInputInvalidURL3(t *testing.T) {
+	//Mock GET response:
+	test := Tests{
+		name: "Should return the output with fields:0 when input is empty",
+		server: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(0)
+			w.Write([]byte(""))
+		})),
+		response: &GetHeadResponse{
+			Url:           "",
+			StatusCode:    0,
+			ContentLength: 0,
+		},
+		expectedError: nil,
+	}
+
+	//Test service
+	t.Run(test.name, func(t *testing.T) {
+		defer test.server.Close()
+
+		resp := GetHeadResponseService("")
+
+		if !reflect.DeepEqual(resp, test.response) {
+			t.Errorf("FAILED: expected %v, got %v\n", test.response, resp)
+		}
+	})
+}
+
+func TestInputInvalidURL4(t *testing.T) {
+	//Mock GET response:
+	test := Tests{
+		name: "Should return the output with fields:0 when input are symbols",
+		server: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(0)
+			w.Write([]byte(""))
+		})),
+		response: &GetHeadResponse{
+			Url:           "~!@#$%^\u0026*()_+{}|:\"\u003c\u003e?,./';\\[]=˙ˊˋˇ",
+			StatusCode:    0,
+			ContentLength: 0,
+		},
+		expectedError: nil,
+	}
+
+	//Test service
+	t.Run(test.name, func(t *testing.T) {
+		defer test.server.Close()
+
+		resp := GetHeadResponseService("~!@#$%^\u0026*()_+{}|:\"\u003c\u003e?,./';\\[]=˙ˊˋˇ")
 
 		if !reflect.DeepEqual(resp, test.response) {
 			t.Errorf("FAILED: expected %v, got %v\n", test.response, resp)

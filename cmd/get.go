@@ -24,6 +24,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"sync"
@@ -36,7 +37,6 @@ type GetHeadResponse struct {
 	Url           string `json:"Url"`
 	StatusCode    int    `json:"Status-Code"`
 	ContentLength int64  `json:"Content-Length"`
-	// ContentType   string `json:"Content-Type"`
 }
 
 // getCmd represents the get command
@@ -45,12 +45,12 @@ var getCmd = &cobra.Command{
 	Short: "Get certain properties of the HTTP responses",
 	Long: `This command makes HTTP request and reports on certain properties
 	of the responses it receives back.`,
-	// Args: cobra.RangeArgs(1, 2),TODO: input at least one parm.
+	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		scn := bufio.NewScanner(os.Stdin)
 		for {
-			fmt.Println("Enter Urls:")
+			fmt.Println("Please enter URLs:")
 			var lines []string
 			for scn.Scan() {
 				line := scn.Text()
@@ -65,30 +65,11 @@ var getCmd = &cobra.Command{
 
 			}
 
+			//Print result
 			if len(lines) > 0 {
 				fmt.Println()
 				fmt.Println("Result:")
-				//-----v2-----
-				// fetchResponse(lines)
-				//-----v2-----
-
-				//-----v1-----
-				// GoFetchResponseData(lines)
-				//-----v1-----
-
-				//-----v3
 				fetchResponse(lines)
-				//-----v3
-
-				//-----v4
-				// goChannel(lines)
-				//-----v4
-
-				// for _, line := range lines {
-				// 	// fmt.Println(line)
-				// 	result := GetHeadResponseService(line)
-				// 	prettyJSON(result)
-				// }
 				fmt.Println()
 			}
 
@@ -104,23 +85,6 @@ var getCmd = &cobra.Command{
 	},
 }
 
-func goChannel(urls []string) {
-	ch := make(chan string)
-	go runChannel(urls, ch)
-	for output := range ch {
-		fmt.Println(output)
-	}
-}
-
-func runChannel(urls []string, ch chan string) {
-	for i := 0; i < len(urls); i++ {
-		result := GetHeadResponseService(urls[i])
-		ch <- prettyJSON(*result)
-	}
-	close(ch)
-}
-
-//-----v2-----
 func fetchResponse(links []string) {
 	// fmt.Println("HomePage Endpoint Hit")
 	var wg sync.WaitGroup
@@ -141,61 +105,25 @@ func fetchResponse(links []string) {
 	}
 }
 
-//-----v2-----
-
-//---------------V1------------------------
-//Go routinure to fetch data
-func GoFetchResponseData(links []string) {
-	c := make(chan GetHeadResponse)
-	var wg sync.WaitGroup
-
-	for _, link := range links {
-		wg.Add(1) // This tells the waitgroup, that there is now 1 pending operation here
-		go FetchResponseData(link, c, &wg)
-		// fmt.Println(prettyJSON(<-c))
-	}
-
-	// this function literal (also called 'anonymous function' or 'lambda expression' in other languages)
-	// is useful because 'go' needs to prefix a function and we can save some space by not declaring a whole new function for this
-	go func() {
-		wg.Wait() // this blocks the goroutine until WaitGroup counter is zero
-		close(c)  // Channels need to be closed, otherwise the below loop will go on forever
-	}() // This calls itself
-
-	// this shorthand loop is syntactic sugar for an endless loop that just waits for results to come in through the 'c' channel
-	for response := range c {
-		fmt.Println(prettyJSON(response))
-		// fmt.Println(response)
-	}
-}
-
-func FetchResponseData(url string, c chan GetHeadResponse, wg *sync.WaitGroup) {
-	defer (*wg).Done()
-	result := GetHeadResponseService(url)
-	// fmt.Println(result)
-	// time.Sleep(3 * time.Second)
-	c <- *result // pump the result into the channel
-}
-
-//---------------V1------------------------
-
-//Dial: dialTimeout
 //GetHeadResponseService function mainly get the response head info
-func GetHeadResponseService(requestURL string) *GetHeadResponse {
+func GetHeadResponseService(req string) *GetHeadResponse {
+	validResult, err := url.ParseRequestURI(req)
+	if err != nil {
+		return &GetHeadResponse{req, 0, 0}
+	}
+	requestURL := validResult.String()
 	var DefaultTransport http.RoundTripper = &http.Transport{
 		Dial:                (&net.Dialer{Timeout: 2 * time.Second}).Dial,
 		TLSHandshakeTimeout: 5 * time.Second}
 	request, _ := http.NewRequest("GET", requestURL, nil)
 	response, err := DefaultTransport.RoundTrip(request)
 	if err != nil {
-		// fmt.Printf("%s", err)
 		return &GetHeadResponse{requestURL, 0, 0}
 	}
 	defer response.Body.Close()
 
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		// fmt.Printf("%s", err)
 		return &GetHeadResponse{requestURL, 0, 0}
 	}
 
@@ -205,12 +133,6 @@ func GetHeadResponseService(requestURL string) *GetHeadResponse {
 		StatusCode:    response.StatusCode,
 		ContentLength: int64(binary.Size(contents)),
 	}
-	// prettyJSON, err := json.MarshalIndent(result, "", "   ")
-	// if err != nil {
-	// 	log.Fatal("Failed to generate json", err)
-	// }
-	// fmt.Println(string(prettyJSON))
-	// wg.Done()
 	return &result
 }
 
@@ -220,12 +142,6 @@ func prettyJSON(result GetHeadResponse) string {
 		log.Fatal("Failed to generate json", err)
 	}
 	return string(prettyJSON)
-}
-
-//TODO: Valid input
-func isValidInput(line string) bool {
-
-	return true
 }
 
 func init() {

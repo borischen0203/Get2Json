@@ -9,12 +9,14 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/borischen0203/Get2Json/dto"
 )
 
+//This services mainly output header info as json format by inputting one or multiple URLs
 func FetchResponseService(links []string) {
 	var wg sync.WaitGroup
 	m := make(map[int]dto.HeadResponse)
@@ -33,11 +35,15 @@ func FetchResponseService(links []string) {
 	}
 }
 
-func GetHeadResponse(req string) *dto.HeadResponse {
-	validResult, err := url.ParseRequestURI(req)
+//This function mainly get Http response by URL
+func GetHeadResponse(reqURL string) *dto.HeadResponse {
+	//Valid URL and remove space extra space
+	validResult, err := url.ParseRequestURI(strings.TrimSpace(reqURL))
 	if err != nil {
-		return &dto.HeadResponse{req, 0, 0}
+		return &dto.HeadResponse{reqURL, 0, 0}
 	}
+
+	//GET HTTP response
 	requestURL := validResult.String()
 	var DefaultTransport http.RoundTripper = &http.Transport{
 		Dial:                (&net.Dialer{Timeout: 2 * time.Second}).Dial,
@@ -63,6 +69,7 @@ func GetHeadResponse(req string) *dto.HeadResponse {
 	return &result
 }
 
+//This function mainly print pretty Json string
 func prettyJSON(result dto.HeadResponse) string {
 	prettyJSON, err := json.MarshalIndent(result, "", "   ")
 	if err != nil {

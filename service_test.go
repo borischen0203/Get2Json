@@ -85,6 +85,108 @@ func TestInputValidURL2(t *testing.T) {
 	})
 }
 
+func TestInputValidURL3(t *testing.T) {
+	//Mock GET response:
+	test := Tests{
+		name: "Should return the correct output when input is ending with multiple slashes",
+		server: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusMovedPermanently)
+			w.Write([]byte(`<html>
+			<head><title>301 Moved Permanently</title></head>
+			<body>
+			<center><h1>301 Moved Permanently</h1></center>
+			<hr><center>nginx/1.16.1</center>
+			</body>
+			</html>`))
+		})),
+		response: &dto.HeadResponse{
+			Url:           "http://www.bbc.co.uk/iplayer///////",
+			StatusCode:    301,
+			ContentLength: 169,
+		},
+		expectedError: nil,
+	}
+
+	//Test service
+	t.Run(test.name, func(t *testing.T) {
+		defer test.server.Close()
+
+		resp := services.GetHeadResponse("http://www.bbc.co.uk/iplayer///////")
+
+		if !reflect.DeepEqual(resp, test.response) {
+			t.Errorf("FAILED: expected %v, got %v\n", test.response, resp)
+		}
+	})
+}
+
+func TestInputValidURL4(t *testing.T) {
+	//Mock GET response:
+	test := Tests{
+		name: "Should return the correct output when input is ending with multiple space",
+		server: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusMovedPermanently)
+			w.Write([]byte(`<html>
+			<head><title>301 Moved Permanently</title></head>
+			<body>
+			<center><h1>301 Moved Permanently</h1></center>
+			<hr><center>nginx/1.16.1</center>
+			</body>
+			</html>`))
+		})),
+		response: &dto.HeadResponse{
+			Url:           "http://www.bbc.co.uk/iplayer",
+			StatusCode:    301,
+			ContentLength: 169,
+		},
+		expectedError: nil,
+	}
+
+	//Test service
+	t.Run(test.name, func(t *testing.T) {
+		defer test.server.Close()
+
+		resp := services.GetHeadResponse("http://www.bbc.co.uk/iplayer               ")
+
+		if !reflect.DeepEqual(resp, test.response) {
+			t.Errorf("FAILED: expected %v, got %v\n", test.response, resp)
+		}
+	})
+}
+
+func TestInputValidURL5(t *testing.T) {
+	//Mock GET response:
+	test := Tests{
+		name: "Should return the correct output when input is starting with multiple space",
+		server: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusMovedPermanently)
+			w.Write([]byte(`<html>
+			<head><title>301 Moved Permanently</title></head>
+			<body>
+			<center><h1>301 Moved Permanently</h1></center>
+			<hr><center>nginx/1.16.1</center>
+			</body>
+			</html>`))
+		})),
+		response: &dto.HeadResponse{
+			Url:           "http://www.bbc.co.uk/iplayer",
+			StatusCode:    301,
+			ContentLength: 169,
+		},
+		expectedError: nil,
+	}
+
+	//Test service
+	t.Run(test.name, func(t *testing.T) {
+		defer test.server.Close()
+
+		resp := services.GetHeadResponse("          http://www.bbc.co.uk/iplayer")
+
+		if !reflect.DeepEqual(resp, test.response) {
+			t.Errorf("FAILED: expected %v, got %v\n", test.response, resp)
+		}
+	})
+}
+
 func TestInputInvalidURL1(t *testing.T) {
 	//Mock GET response:
 	test := Tests{

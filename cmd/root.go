@@ -32,8 +32,6 @@ var rootCmd = &cobra.Command{
 	Use:   "Get2Json",
 	Short: "Get2Json cli in Go",
 	Long:  `Get2Json cli application written in Go.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
 		sentence := "Welcome to get2json!"
 		services.GopherSay(sentence)

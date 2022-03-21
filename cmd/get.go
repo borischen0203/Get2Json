@@ -19,7 +19,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/borischen0203/Get2Json/services"
 	"github.com/spf13/cobra"
@@ -35,6 +34,7 @@ var getCmd = &cobra.Command{
 	Run:  GetResponseCommand,
 }
 
+//This function mainly excute get command
 func GetResponseCommand(cmd *cobra.Command, args []string) {
 	scn := bufio.NewScanner(os.Stdin)
 	for {
@@ -48,8 +48,7 @@ func GetResponseCommand(cmd *cobra.Command, args []string) {
 					break
 				}
 			}
-			//Remove space before add to lines
-			lines = append(lines, strings.TrimSpace(line))
+			lines = append(lines, line)
 
 		}
 

@@ -30,18 +30,18 @@ type Tests struct {
 // 		},
 // 		expectedError: nil,
 // 	}
+//
+// 	//Test service
+// 	t.Run(test.name, func(t *testing.T) {
+// 		defer test.server.Close()
 
-	//Test service
-	t.Run(test.name, func(t *testing.T) {
-		defer test.server.Close()
+// 		resp := GetHeadResponseService("http://checkip.amazonaws.com")
 
-		resp := GetHeadResponseService("http://checkip.amazonaws.com")
-
-		if !reflect.DeepEqual(resp, test.response) {
-			t.Errorf("FAILED: expected %v, got %v\n", test.response, resp)
-		}
-	})
-}
+// 		if !reflect.DeepEqual(resp, test.response) {
+// 			t.Errorf("FAILED: expected %v, got %v\n", test.response, resp)
+// 		}
+// 	})
+// }
 
 func TestInputValidURL2(t *testing.T) {
 	//Mock GET response:
@@ -127,18 +127,18 @@ func TestInputValidURL3(t *testing.T) {
 // 		},
 // 		expectedError: nil,
 // 	}
+//
+//Test service
+// 	t.Run(test.name, func(t *testing.T) {
+// 		defer test.server.Close()
 
-	//Test service
-	t.Run(test.name, func(t *testing.T) {
-		defer test.server.Close()
+// 		resp := GetHeadResponseService("http://checkip.amazonaws.com//////////")
 
-		resp := GetHeadResponseService("http://checkip.amazonaws.com//////////")
-
-		if !reflect.DeepEqual(resp, test.response) {
-			t.Errorf("FAILED: expected %v, got %v\n", test.response, resp)
-		}
-	})
-}
+// 		if !reflect.DeepEqual(resp, test.response) {
+// 			t.Errorf("FAILED: expected %v, got %v\n", test.response, resp)
+// 		}
+// 	})
+// }
 
 func TestInputInvalidURL1(t *testing.T) {
 	//Mock GET response:

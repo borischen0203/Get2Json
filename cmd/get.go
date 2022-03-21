@@ -36,6 +36,7 @@ type GetHeadResponse struct {
 	Url           string `json:"Url"`
 	StatusCode    int    `json:"Status-Code"`
 	ContentLength int64  `json:"Content-Length"`
+	// ContentType   string `json:"Content-Type"`
 }
 
 // getCmd represents the get command
@@ -54,14 +55,14 @@ var getCmd = &cobra.Command{
 			for scn.Scan() {
 				line := scn.Text()
 				if len(line) == 1 {
-					// Group Separator (GS ^]): ctrl-]
+					// enter q to into next step or exit
 					if line[0] == 'q' {
 						break
 					}
 				}
-				//TODO: if isValidInput(line){
+				//Remove space before add to lines
 				lines = append(lines, strings.TrimSpace(line))
-				//}
+
 			}
 
 			if len(lines) > 0 {
@@ -76,7 +77,7 @@ var getCmd = &cobra.Command{
 				//-----v1-----
 
 				//-----v3
-				// fetchResponse(lines)
+				fetchResponse(lines)
 				//-----v3
 
 				//-----v4
@@ -100,40 +101,6 @@ var getCmd = &cobra.Command{
 			}
 		}
 
-		// fetchResponse(args)
-		// for _, link := range args {
-		// 	go GetHttpResponse(link)
-		// 	// fmt.Println(GetHttpResponse(link))
-		// }
-
-		// GoFetchResponseData(args)
-
-		// links := []string{
-		// 	"https://github.com/fabpot",
-		// 	"https://github.com/andrew",
-		// 	"https://github.com/taylorotwell",
-		// 	"https://github.com/egoist",
-		// 	"https://github.com/HugoGiraudel",
-		// }
-		// c := make(chan string)
-		// var wg sync.WaitGroup
-
-		// for _, link := range wh {
-		// 	wg.Add(1) // This tells the waitgroup, that there is now 1 pending operation here
-		// 	go checkUrl(link, c, &wg)
-		// }
-
-		// // this function literal (also called 'anonymous function' or 'lambda expression' in other languages)
-		// // is useful because 'go' needs to prefix a function and we can save some space by not declaring a whole new function for this
-		// go func() {
-		// 	wg.Wait() // this blocks the goroutine until WaitGroup counter is zero
-		// 	close(c)  // Channels need to be closed, otherwise the below loop will go on forever
-		// }() // This calls itself
-
-		// // this shorthand loop is syntactic sugar for an endless loop that just waits for results to come in through the 'c' channel
-		// for msg := range c {
-		// 	fmt.Println(msg)
-		// }
 	},
 }
 
@@ -148,7 +115,7 @@ func goChannel(urls []string) {
 func runChannel(urls []string, ch chan string) {
 	for i := 0; i < len(urls); i++ {
 		result := GetHeadResponseService(urls[i])
-		ch <- prettyJSON(result)
+		ch <- prettyJSON(*result)
 	}
 	close(ch)
 }
@@ -164,7 +131,7 @@ func fetchResponse(links []string) {
 		go func(index int, url string) {
 			// time.Sleep(1 * time.Second)
 			result := GetHeadResponseService(url)
-			m[index] = result
+			m[index] = *result
 			wg.Done()
 		}(index, url)
 	}
@@ -172,9 +139,6 @@ func fetchResponse(links []string) {
 	for i := 0; i < len(links); i++ {
 		fmt.Println(prettyJSON(m[i]))
 	}
-
-	// fmt.Println("Returning Response")
-	// fmt.Fprintf(w, "Responses")
 }
 
 //-----v2-----
@@ -210,35 +174,30 @@ func FetchResponseData(url string, c chan GetHeadResponse, wg *sync.WaitGroup) {
 	result := GetHeadResponseService(url)
 	// fmt.Println(result)
 	// time.Sleep(3 * time.Second)
-	c <- result // pump the result into the channel
+	c <- *result // pump the result into the channel
 }
 
 //---------------V1------------------------
-var timeout = time.Duration(2 * time.Second)
-
-func dialTimeout(network, addr string) (net.Conn, error) {
-	return net.DialTimeout(network, addr, timeout)
-}
 
 //Dial: dialTimeout
 //GetHeadResponseService function mainly get the response head info
-func GetHeadResponseService(requestURL string) GetHeadResponse {
-	// var DefaultTransport http.RoundTripper = &http.Transport{Dial: dialTimeout}
+func GetHeadResponseService(requestURL string) *GetHeadResponse {
 	var DefaultTransport http.RoundTripper = &http.Transport{
 		Dial:                (&net.Dialer{Timeout: 2 * time.Second}).Dial,
 		TLSHandshakeTimeout: 5 * time.Second}
 	request, _ := http.NewRequest("GET", requestURL, nil)
 	response, err := DefaultTransport.RoundTrip(request)
 	if err != nil {
-		// fmt.Printf("%s", err)
-		return GetHeadResponse{requestURL, 0, 0}
+		fmt.Printf("%s", err)
+		fmt.Println(err.Error())
+		return &GetHeadResponse{requestURL, 0, 0}
 	}
 	defer response.Body.Close()
 
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		fmt.Printf("%s", err)
-		return GetHeadResponse{requestURL, 0, 0}
+		return &GetHeadResponse{requestURL, 0, 0}
 	}
 
 	//Set response
@@ -253,7 +212,7 @@ func GetHeadResponseService(requestURL string) GetHeadResponse {
 	// }
 	// fmt.Println(string(prettyJSON))
 	// wg.Done()
-	return result
+	return &result
 }
 
 func prettyJSON(result GetHeadResponse) string {

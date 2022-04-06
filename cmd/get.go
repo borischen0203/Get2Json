@@ -49,7 +49,6 @@ func GetResponseCommand(cmd *cobra.Command, args []string) {
 				}
 			}
 			lines = append(lines, line)
-
 		}
 
 		//Print result

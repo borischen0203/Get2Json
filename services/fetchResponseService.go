@@ -33,6 +33,7 @@ func FetchResponseService(links []string) {
 	for i := 0; i < len(links); i++ {
 		fmt.Println(prettyJSON(m[i]))
 	}
+	writeJSON(m)
 }
 
 //This function mainly get Http response by URL
@@ -76,4 +77,17 @@ func prettyJSON(result dto.HeadResponse) string {
 		log.Fatal("Failed to generate json", err)
 	}
 	return string(prettyJSON)
+}
+
+func writeJSON(m map[int]dto.HeadResponse) {
+	result := make([]dto.HeadResponse, len(m))
+	for k, v := range m {
+		result[k] = v
+	}
+	file, err := json.MarshalIndent(result, "", " ")
+	if err != nil {
+		log.Println("Unable to create json file")
+		return
+	}
+	_ = ioutil.WriteFile("output.json", file, 0644)
 }

@@ -31,9 +31,9 @@ func FetchResponseService(links []string) {
 	}
 	wg.Wait()
 	for i := 0; i < len(links); i++ {
-		fmt.Println(prettyJSON(m[i]))
+		fmt.Println(PrettyJSON(m[i]))
 	}
-	writeJSON(m)
+	// writeJSON(m)
 }
 
 //This function mainly get Http response by URL
@@ -71,7 +71,7 @@ func GetHeadResponse(reqURL string) *dto.HeadResponse {
 }
 
 //This function mainly print pretty Json string
-func prettyJSON(result dto.HeadResponse) string {
+func PrettyJSON(result dto.HeadResponse) string {
 	prettyJSON, err := json.MarshalIndent(result, "", "   ")
 	if err != nil {
 		log.Fatal("Failed to generate json", err)

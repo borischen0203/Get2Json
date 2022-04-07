@@ -37,9 +37,11 @@ Step2:  Run docker image as below command
 ```bash
 docker run -it --rm borischen0203/get2json get
 ```
+or
 
-
-
+```bash
+docker run -v <file path>:<file path> -it --rm borischen0203/get2json get <file path>
+```
 
 ### Docker run demo
 ```bash
@@ -62,7 +64,22 @@ $ Result:
    "Content-Length": 15
 }
 ```
+```bash
+# Display the output header info by input file path
+$ docker run -v /Users/boris/Desktop/input.txt:/Users/boris/Desktop/input.txt -it --rm get2json get /Users/boris/Desktop/input.txt
 
+$ Result:
+{
+   "Url": "http://www.bbc.co.uk/iplayer",
+   "Status-Code": 301,
+   "Content-Length": 169
+}
+{
+   "Url": "http://checkip.amazonaws.com",
+   "Status-Code": 200,
+   "Content-Length": 15
+}
+```
 
 ## Run in Local:
 
@@ -86,6 +103,10 @@ Step3: Execute build file with get command
 ```bash
 ./bin/get2json get
 ```
+or
+```bash
+./bin/get2json get <file path>
+```
 
 ### Local run demo
 ```bash
@@ -108,6 +129,23 @@ $ Result:
    "Content-Length": 15
 }
 ```
+```bash
+# Display the output header info by file path
+$ ./bin/get2json get /Users/boris/Desktop/input.txt
+
+$ Result:
+{
+   "Url": "http://www.bbc.co.uk/iplayer",
+   "Status-Code": 301,
+   "Content-Length": 169
+}
+{
+   "Url": "http://checkip.amazonaws.com",
+   "Status-Code": 200,
+   "Content-Length": 15
+}
+```
+
 
 ## Tech stack
 - Golang
@@ -119,4 +157,5 @@ $ Result:
 - go Concurrency(WaitGroup)
 
 ## Todo:
-- [ ] Be able to input file path and output json file.
+- [X] Be able to input file path.
+- [X] Be able to output json file.

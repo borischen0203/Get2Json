@@ -18,6 +18,7 @@ package cmd
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/borischen0203/Get2Json/services"
@@ -30,12 +31,47 @@ var getCmd = &cobra.Command{
 	Short: "Get certain properties of the HTTP responses",
 	Long: `This command makes HTTP request and reports on certain properties
 	of the responses it receives back.`,
-	Args: cobra.NoArgs,
+	Args: cobra.RangeArgs(0, 1),
 	Run:  GetResponseCommand,
 }
 
 //This function mainly excute get command
 func GetResponseCommand(cmd *cobra.Command, args []string) {
+	if len(args) == 1 {
+		//With input a file path
+		readFile(args[0])
+	} else {
+		//Without input a path
+		readEnter()
+	}
+}
+
+//This function read the file path and output result
+func readFile(path string) {
+	file, err := os.Open(path)
+	if err != nil {
+		log.Fatalf("open file error: %v", err)
+		return
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	var lines []string
+	for scanner.Scan() {
+		line := scanner.Text()
+		lines = append(lines, line)
+	}
+	if len(lines) > 0 {
+		fmt.Println("Result:")
+		services.FetchResponseService(lines)
+		fmt.Println()
+	} else {
+		fmt.Println("Empty content")
+	}
+}
+
+//This function read user input by line and output result
+func readEnter() {
 	scn := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Println("Please enter URLs:")

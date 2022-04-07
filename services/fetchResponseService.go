@@ -33,7 +33,7 @@ func FetchResponseService(links []string) {
 	for i := 0; i < len(links); i++ {
 		fmt.Println(PrettyJSON(m[i]))
 	}
-	// writeJSON(m)
+	writeJSON(m)
 }
 
 //This function mainly get Http response by URL

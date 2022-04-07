@@ -91,7 +91,9 @@ func readEnter() {
 		if len(lines) > 0 {
 			fmt.Println()
 			fmt.Println("Result:")
+			fmt.Println("［")
 			services.FetchResponseService(lines)
+			fmt.Println("］")
 			fmt.Println()
 		}
 

@@ -24,6 +24,7 @@ func FetchResponseService(links []string) {
 	wg.Add(len(links))
 	for index, url := range links {
 		go func(index int, url string) {
+			//put response into a map, index as a key, headResponse ad value
 			result := GetHeadResponse(url)
 			m[index] = *result
 			wg.Done()
@@ -33,7 +34,7 @@ func FetchResponseService(links []string) {
 	for i := 0; i < len(links); i++ {
 		fmt.Println(PrettyJSON(m[i]))
 	}
-	writeJSON(m)
+	writeJSON(m) // output a json file
 }
 
 //This function mainly get Http response by URL

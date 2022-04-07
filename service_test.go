@@ -47,6 +47,11 @@ func TestInputValidURL1(t *testing.T) {
 		test.response.Url = test.server.URL
 		defer test.server.Close()
 
+		/**
+		 *  For the mock purposes, the GetHeadResponse should be input test.server.URL but not a real URL
+		 *  test.server.URL would be http://127.0.0.1:59019 and the port would change everytime.
+		 */
+
 		//input the test URL
 		resp := services.GetHeadResponse(test.server.URL)
 
